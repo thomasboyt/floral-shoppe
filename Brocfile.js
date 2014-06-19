@@ -8,13 +8,21 @@ var mergeTrees = require('broccoli-merge-trees');
 
 var IS_PRODUCTION = require('broccoli-env').getEnv() === 'production';
 
-var app = pickFiles('.', {
+var appJs = pickFiles('app', {
   srcDir: '/',
-  files: ['lib/**/*.js', 'src/**/*.js'],
-  destDir: '/'
+  files: ['**/*.js'],
+  destDir: '/app'
 });
 
-var index = pickFiles('.', {
+var libJs = pickFiles('lib', {
+  srcDir: '/',
+  files: ['**/*.js'],
+  destDir: '/lib'
+});
+
+var js = mergeTrees([appJs, libJs]);
+
+var index = pickFiles('app', {
   srcDir: '/',
   files: ['index.hbs'],
   destDir: '/'
@@ -28,18 +36,18 @@ index = HBSPages(index, {
   helpers: null
 });
 
-var data = pickFiles('.', {
-  srcDir: 'data',
+var data = pickFiles('data/', {
+  srcDir: '/',
   files: ['**/*'],
-  destDir: 'data'
+  destDir: '/data'
 });
 
 if ( IS_PRODUCTION ) {
-  app = concat(app, {
-    inputFiles: ['lib/**/*.js', 'src/**/*.js'],
+  js = concat(js, {
+    inputFiles: ['lib/**/*.js', 'app/**/*.js'],
     outputFile: '/vis.min.js'
   });
-  app = uglify(app);
+  app = uglify(js);
 }
 
-module.exports = mergeTrees([app, index, data]);
+module.exports = mergeTrees([js, index, data]);

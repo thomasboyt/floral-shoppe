@@ -55,7 +55,6 @@
   function render() {
     requestAnimationFrame(render);
     floor.update();
-    background.tex.needsUpdate = true;
     renderer.render(scene, camera);
   }
   render();
